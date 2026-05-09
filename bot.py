@@ -29,7 +29,13 @@ MEMBRES_EQUIPE = {
 }        # "danger-alarm-sound-effect-meme.mp3"
 
 PARIS_TZ = pytz.timezone("Europe/Paris")
-discord.opus.load_opus(subprocess.run(['brew', '--prefix', 'opus'], capture_output=True, text=True).stdout.strip() + '/lib/libopus.dylib')
+try:
+    discord.opus.load_opus(subprocess.run(['brew', '--prefix', 'opus'], capture_output=True, text=True).stdout.strip() + '/lib/libopus.dylib')
+except:
+    try:
+        discord.opus.load_opus('libopus.so.0')
+    except:
+        pass
 
 # ─────────────────────────────────────────────
 #  LOGGING
