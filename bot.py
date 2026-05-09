@@ -223,7 +223,16 @@ async def play_alarm_loop(vc_client: discord.VoiceClient):
 
 async def ping_absent_loop():
     """Ping les membres non validés toutes les 2 minutes."""
-    await asyncio.sleep(120)   # première attente avant de pinger
+    await asyncio.sleep(300)   # attendre 5 minutes
+    if active_cycle:
+        absent = get_absent_members()
+        if absent:
+            mentions = " ".join(m.mention for m in absent)
+            admin = await bot.fetch_user(ADMIN_ID)
+            await admin.send(
+                f"⚠️ **5 minutes écoulées — check non complété !**\n"
+                f"Membres n'ayant pas validé : {mentions}"
+            )
     while active_cycle:
         absent = get_absent_members()
         if not absent:
