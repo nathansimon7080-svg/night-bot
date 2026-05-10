@@ -304,8 +304,37 @@ async def on_ready():
     scheduler.start()
 
 
+@bot.event
+async def on_reaction_add(reaction, user):
+    global active_cycle
+
+    if user.bot or active_cycle is None:
+        return
+
+    check_msg = active_cycle.get("check_msg")
+    if reaction.message.id != check_msg.id:
+        return
+
+    if str(reaction.emoji) != "✅":
+        return
+
+    if user.id not in MEMBRES_EQUIPE:
+        return
+
+    if user.id in active_cycle["validated"]:
+        return
+
+    if user.id not in active_cycle["members"]:
+        active_cycle["members"][user.id] = user
+
+    active_cycle["validated"].add(user.id)
+    text_ch = active_cycle["text_channel"]
+    await text_ch.send(f"👍 **{user.display_name}** a confirmé sa présence.")
+
+    await check_all_validated()
+
+
 async def kick_if_deaf(member: discord.Member):
-    """Kick le membre du vocal s'il a toujours le son coupé après 3 minutes."""
     await asyncio.sleep(180)
     if active_cycle is None:
         return
@@ -330,7 +359,6 @@ async def on_voice_state_update(member, before, after):
     if member.bot or member.id not in MEMBRES_EQUIPE:
         return
 
-    # Détecter le son coupé pendant un cycle
     if active_cycle is not None:
         if after.channel and after.channel.id == VOICE_CHANNEL_ID:
             if after.self_deaf or after.deaf:
@@ -343,27 +371,6 @@ async def on_voice_state_update(member, before, after):
                     f"🔇 **{member.display_name}** a coupé son son pendant un check !"
                 )
                 asyncio.ensure_future(kick_if_deaf(member))
-
-    if active_cycle is not None:
-        if before.channel and before.channel.id == VOICE_CHANNEL_ID:
-            if after.channel is None or after.channel.id != VOICE_CHANNEL_ID:
-                if member.id in active_cycle["members"]:
-                    voice_channel = active_cycle["guild"].get_channel(VOICE_CHANNEL_ID)
-                    try:
-                        await member.move_to(voice_channel)
-                        text_ch = active_cycle["text_channel"]
-                        await text_ch.send(
-                            f"⛔ {member.mention} tu ne peux pas quitter le vocal pendant un check !"
-                        )
-                    except Exception:
-                        del active_cycle["members"][member.id]
-                        active_cycle["validated"].discard(member.id)
-                        log.info(f"{member.display_name} a quitté le vocal — retiré du cycle.")
-                        text_ch = active_cycle["text_channel"]
-                        await text_ch.send(
-                            f"⚠️ {member.mention} a quitté le vocal et a été retiré du check."
-                        )
-                        await check_all_validated()
 
     if active_cycle is not None:
         if before.channel and before.channel.id == VOICE_CHANNEL_ID:
