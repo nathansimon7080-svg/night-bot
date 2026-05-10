@@ -19,7 +19,7 @@ import logging
 BOT_TOKEN = os.getenv("DISCORD_TOKEN")
 TEXT_CHANNEL_ID  = 1502608329036267590   # ID du salon texte
 VOICE_CHANNEL_ID = 1461405605465165874   # ID du salon vocal
-ALARM_FILE = "danger-alarm-sound-effect-meme.mp3" 
+ALARM_FILE = "https://www.soundjay.com/misc/sounds/fail-trombone-01.mp3"
 ADMIN_ID = 1210279264155340883  # Toi
 MEMBRES_EQUIPE = {
     899395182640898048,   # __merveil229__
@@ -208,9 +208,6 @@ async def start_cycle(guild: discord.Guild, members: list[discord.Member], t: da
 
 async def play_alarm_loop(vc_client: discord.VoiceClient):
     """Joue le fichier audio en boucle jusqu'à l'arrêt du cycle."""
-    if not os.path.isfile(ALARM_FILE):
-        log.warning(f"Fichier audio '{ALARM_FILE}' introuvable — alarme silencieuse.")
-        return
 
     while active_cycle and vc_client.is_connected():
         source = discord.FFmpegPCMAudio(ALARM_FILE)
