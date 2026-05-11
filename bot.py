@@ -210,7 +210,7 @@ async def play_alarm_loop(vc_client: discord.VoiceClient):
     """Joue le fichier audio en boucle jusqu'à l'arrêt du cycle."""
 
     while active_cycle and vc_client.is_connected():
-        source = discord.FFmpegPCMAudio(ALARM_FILE)
+        source = discord.FFmpegPCMAudio(ALARM_FILE, before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
         vc_client.play(source)
         # Attendre la fin de la lecture avant de relancer
         while vc_client.is_playing():
