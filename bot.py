@@ -19,7 +19,7 @@ import logging
 BOT_TOKEN = os.getenv("DISCORD_TOKEN")
 TEXT_CHANNEL_ID  = 1502608329036267590   # ID du salon texte
 VOICE_CHANNEL_ID = 1461405605465165874   # ID du salon vocal
-ALARM_FILE = "https://www.soundjay.com/misc/sounds/fail-trombone-01.mp3"
+ALARM_FILE = "danger-alarm-sound-effect-meme.mp3"
 ADMIN_ID = 1210279264155340883  # Toi
 MEMBRES_EQUIPE = {
     899395182640898048,   # __merveil229__
